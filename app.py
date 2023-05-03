@@ -1,5 +1,5 @@
 import os
-
+from datetime import datetime
 from flask import Flask, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
@@ -23,6 +23,7 @@ class Form(db.Model):
     date = db.Column(db.Date)
     occupation = db.Column(db.String(80))
 
+
 # Render the html home page
 @app.route("/", methods=['GET', "POST"])
 def index():
@@ -31,7 +32,13 @@ def index():
         last_name = request.form["last_name"]
         email_address = request.form["email_address"]
         date = request.form["date"]
+        date_obj = datetime.strptime(date, "%Y-%m-%d")
         occupation = request.form["occupation"]
+
+        form = Form(first_name=first_name, last_name=last_name,
+                    email=email_address, date=date_obj, occupation=occupation)
+        db.session.add(form)
+        db.session.commit()
 
     return render_template("index.html")
 
